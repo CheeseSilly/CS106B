@@ -1,4 +1,5 @@
 #include "WhatAreYouDoing.h"
+#include "strlib.h"
 using namespace std;
 
 /* TODO: Read the comments in WhatAreYouDoing.h to see what this function needs to do, then
@@ -7,10 +8,43 @@ using namespace std;
  * Don't forget about the tokenize function defined in WhatAreYouDoing.h; you'll almost
  * certainly want to use it.
  */
+
+Set<string> helper(const Vector<string>&sentence,Vector<string>&edit,int index);
+
 Set<string> allEmphasesOf(const string& sentence) {
     /* TODO: Delete this line and the next one, then implement this function. */
-    (void) sentence;
-    return {};
+    Vector<string> tokens=tokenize(sentence);
+    int index=0;
+    return helper(tokens,tokens,index);
+
+
+}
+//需要注意不像上一个实验一样，不需要传入Set类型的ans来反复传值，否则无法通过最后的检测
+Set<string> helper(const Vector<string>&sentence,Vector<string>&edit,int index){
+        Set<string> ans;
+        // index 0 -> size()
+        if(index==sentence.size()){
+            string temp;
+            for(string s:edit)temp+=s;
+            ans+=temp;
+            return ans;
+        }
+        //Upper Recursion | Lower Recursion
+        else if(edit.size()>0&&isalpha(sentence[index][0])){
+            string tem1 = toUpperCase(edit[index]);
+            string tem2 = toLowerCase(edit[index]);
+            edit[index]=tem1;
+            ans+=helper(sentence,edit,index+1);
+            edit[index]=tem2;
+            ans+=helper(sentence,edit,index+1);
+            return ans;
+        }
+        // other chars.
+        else
+        {
+            ans+= helper(sentence,edit,index+1);
+            return ans;
+        }
 }
 
 /* * * * * * Test Cases * * * * * */
