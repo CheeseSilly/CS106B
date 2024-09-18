@@ -4,11 +4,57 @@ using namespace std;
 /* TODO: Refer to ShiftScheduling.h for more information about what this function should do.
  * Then, delete this comment and replace it with one of your own.
  */
+Set<Shift> helper(const Set<Shift>& shifts ,const Set<Shift>& edit,int maxHours){
+    if(shifts.size()==0){
+        Set<Shift> ans={};
+        ans+=edit;
+        return ans;
+    }
+    else{
+        Shift item=shifts.first();
+        Set<Shift> remainings=shifts-item;
+        Set<Shift> chooses=edit+item;
+        double sum=0; bool flag=1;
+        for(auto i:chooses){
+            sum+=lengthOf(i);
+        }
+        if(sum>maxHours){
+            flag=0;
+        }
+        for(auto i:edit){
+            if(overlapsWith(i,item)){
+                flag=0;
+                break;
+            }
+        }
+        if(flag){
+            //if choose the way
+            auto h1=helper(remainings,chooses,maxHours);
+            auto h2= helper(remainings,edit,maxHours);
+            int sum1{0},sum2{0};
+            for(auto i:h1){
+                sum1+=valueOf(i);
+            }
+            for(auto i:h2){
+                sum2+=valueOf(i);
+            }
+            return sum1>sum2?h1:h2;
+        }
+        else{
+            return helper(remainings,edit,maxHours);
+        }
+    }
+}
+
 Set<Shift> highestValueScheduleFor(const Set<Shift>& shifts, int maxHours) {
     /* TODO: Delete the next few lines and implement this function. */
-    (void) shifts;
-    (void) maxHours;
-    return {};
+    if(maxHours<0){error("Wrong");return {};}
+    else if(maxHours==0){return {};}
+    else
+    {
+        Set<Shift>ans = helper(shifts,{},maxHours);
+        return ans;
+    };
 }
 
 
