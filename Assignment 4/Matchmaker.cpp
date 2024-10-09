@@ -9,7 +9,35 @@ bool hasPerfectMatching(const Map<string, Set<string>>& possibleLinks, Set<Pair>
             return false;
         }
     }
+    if(possibleLinks.isEmpty()){
+        return true;
+    }
 
+    //递归需要，取首key
+    auto p1=possibleLinks.firstKey();
+    string p2;
+    //bool flag=0;
+    for(auto p2:possibleLinks[p1]){
+        bool flag1=1;//check matching
+        for(auto j:matching){
+            if(j.first()==p2||j.second()==p2){
+                flag1=0;
+                break;
+            }
+        }
+        if(flag1){
+            auto recurlinks=possibleLinks;
+            Set<Pair> recur_matching=matching;
+            Pair pair(p1,p2);
+                recurlinks.remove(p1);
+                recurlinks.remove(p2);
+                recur_matching+=pair;
+                if(hasPerfectMatching(recurlinks,recur_matching)){
+                    matching+=recur_matching;
+                    return true;
+                }
+        }
+    }
 
     return false;
 }
