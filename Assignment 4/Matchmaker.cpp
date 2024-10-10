@@ -42,11 +42,110 @@ bool hasPerfectMatching(const Map<string, Set<string>>& possibleLinks, Set<Pair>
     return false;
 }
 
+Set<Pair> maximumWeightMatchingRec(const Map<string, Map<string, int>>& possibleLinks,int &max) {
+    /* TODO: Delete this comment and these remaining lines, then implement this function. */
+    Set<Pair> maxPair;
+    if(possibleLinks.isEmpty())
+        return maxPair;
+    string first=possibleLinks.firstKey();
+    Map<string, Map<string, int>> remaining1=possibleLinks;
+    int max_temp1=max;
+    remaining1.remove(first);
+    Set<Pair> temp1= maximumWeightMatchingRec(remaining1,max_temp1);//记录去掉当前节点后的最大情况
+    int max_forloop=max;
+    Set<Pair> temp2max;
+    for(string second:possibleLinks[first])//记录包含当前节点的最大情况
+    {
+        if(!possibleLinks.containsKey(second))
+            continue;
+        int max_temp2=max;//每种情况的初始最大值都是当前状态下的最大值
+        Map<string, Map<string, int>> remaining2=possibleLinks;
+
+        max_temp2+=possibleLinks[first][second]; //此处为下面原方案的改进点！！！
+        remaining2.remove(first);
+        remaining2.remove(second);
+        Pair a(first,second);
+        Set<Pair> temp2= maximumWeightMatchingRec(remaining2,max_temp2)+a;
+        if(max_temp2>=max_forloop)
+        {
+            max_forloop=max_temp2;
+            temp2max=temp2;
+        }//找到当前节点所有links下的最大值，并记录集合
+    }
+    if(max_forloop>=max_temp1)
+    {
+        max=max_forloop;
+        maxPair=temp2max;
+    }//比较包含节点和不包含节点的最大值和集合
+    else
+    {
+        max=max_temp1;
+        maxPair=temp1;
+    }
+    //返回最大集合
+    return maxPair;
+
+}
+
 Set<Pair> maximumWeightMatching(const Map<string, Map<string, int>>& possibleLinks) {
     /* TODO: Delete this comment and these remaining lines, then implement this function. */
-    (void) possibleLinks;
-    return { };
+    int max=0;
+    return maximumWeightMatchingRec(possibleLinks,max);
+    /* 以下代码无法通过23、24压力测试，推荐用上面的函数
+    Set<Pair> ans;
+    if(possibleLinks.isEmpty()){
+        return ans;
+    }
+    auto p1=possibleLinks.firstKey();
+    string p2;
+    //找到p1中的最大连接值
+    for(auto i:possibleLinks[p1]){
+        Set<Pair>set;
+        int max=0;
+        Pair pair;
+        int c=0;
+        if(max==0&&possibleLinks[p1][i]<0){
+            max=possibleLinks[p1][i];
+        }
+        if(max<possibleLinks[p1][i]&&possibleLinks.containsKey(i)){
+            max=possibleLinks[p1][i];
+            p2=i;
+        }
+
+    Pair temp2;
+    //比较一下p1与p2的连接最大值
+    for(auto j:possibleLinks[p2]){
+        if(max<possibleLinks[p2][j]){
+            if(possibleLinks.containsKey(j)){
+            max=possibleLinks[p2][j];
+            Pair t(p2,j);
+            temp2=t;
+            c=1;
+            }
+        }
+    }
+    if(c==0&&p2!=""){
+        Pair temp(p1,p2);
+        pair=temp;
+        auto recurlinks=possibleLinks;
+        recurlinks.remove(p1);
+        recurlinks.remove(p2);
+        set.add(pair);
+    return set+=maximumWeightMatching(recurlinks);
+    }else if(c==1){
+        pair=temp2;
+        auto recurlinks=possibleLinks;
+        recurlinks.remove(temp2.first());
+        recurlinks.remove(temp2.second());
+        set.add(pair);
+    return set+=maximumWeightMatching(recurlinks);
+    }
+    ans+=set;
+    }
+    return {};
+    */
 }
+
 
 /* * * * * Test Cases Below This Point * * * * */
 
