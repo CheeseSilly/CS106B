@@ -4,14 +4,69 @@ using namespace std;
 /* TODO: Refer to DisasterPlanning.h for more information about this function.
  * Then, delete this comment.
  */
+bool helper(const Map<string,Set<string>>& roadNetwork,int numCities,Set<string>& supplyLocation,Set<string>&remains){
+    if(numCities<0){
+        error("numCities are negative!!");
+    }
+    // remains are not empty but numCities have run out.
+    if(numCities==0&&!remains.isEmpty()){
+        return false;
+    }
+    if(remains.isEmpty()){
+        return true;
+    }
+    auto current=remains.first();
+    auto temp=remains;
+    //if current city is added to the supply
+    supplyLocation.add(current);
+    remains.remove(current);
+    for(auto i:roadNetwork[current]){
+        if(remains.contains(i))
+        remains.remove(i);
+    }
+    if(helper(roadNetwork,numCities-1,supplyLocation,remains)){
+        return true;
+    }else{
+        remains=temp;
+        supplyLocation.remove(current);
+    }
+
+    //if current's neighbors are added to the supply
+    for(auto i:roadNetwork[current]){
+        /*存在一种情况，一个点虽然不在remains里，但是这个点关系到另外一个其他点无法连接的点，则仍需要将这个不在remains里的点来设置为补给点*/
+        //if(remains.contains(i)){
+            supplyLocation.add(i);
+            remains.remove(i);
+            for(auto j:roadNetwork[i]){
+                if(remains.contains(j)){
+                    remains.remove(j);
+                }
+            }
+            if(helper(roadNetwork,numCities-1,supplyLocation,remains)){
+                return true;
+            }
+            else{
+                remains=temp;
+                supplyLocation.remove(i);
+            }
+        //}
+        //else{
+        //    continue;
+        //}
+    }
+    return false;
+}
+
 bool canBeMadeDisasterReady(const Map<string, Set<string>>& roadNetwork,
                             int numCities,
                             Set<string>& supplyLocations) {
     /* TODO: Delete the next few lines and implement this function. */
-    (void) roadNetwork;
-    (void) numCities;
-    (void) supplyLocations;
-    return false;
+    Set<string>remains;
+    for(auto i:roadNetwork) {
+        remains.add(i);
+    }
+    return helper(roadNetwork,numCities,supplyLocations,remains);
+
 }
 
 
